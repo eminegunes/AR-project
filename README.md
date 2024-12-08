@@ -53,6 +53,10 @@ yarn start
 3. QR kodu mobil cihazınızla tarayın
 4. Uygulamayı kullanmaya başlayın
 
+## Trello
+
+https://trello.com/invite/b/6754a038a2274eca8b7f0fe6/ATTI61668749124e72e6baa4ab4ed0302ecfAF42E0E0/arproject
+
 ## Diyagramlar
 
 https://drive.google.com/drive/folders/1vHn9q9u7GZeQg6QZdV0BSxJSWhgd_jRm?usp=share_link
