@@ -1,4 +1,4 @@
-# AR Oyun 2 - 2D Artırılmış Gerçeklik Oyunu
+# AR Oyun  - 2D Artırılmış Gerçeklik Oyunu
 
 Bu proje, React Native ve Expo kullanılarak geliştirilmiş bir 2D Artırılmış Gerçeklik (AR) oyunudur.
 
