@@ -163,17 +163,17 @@ const SettingsScreen = () => {
                 return (
                   <TouchableOpacity
                     key={colIndex}
-                    style={[
+                    style=[
                       styles.numberBox,
                       isSelected && styles.selectedNumber,
-                    ]}
+                    ]
                     onPress={() => handleNumberSelection(number)}
                   >
                     <Text
-                      style={[
+                      style=[
                         styles.numberText,
                         isSelected && styles.selectedNumberText,
-                      ]}
+                      ]
                     >
                       {number}
                     </Text>
@@ -190,10 +190,14 @@ const SettingsScreen = () => {
             {' '}Nasıl Oynanır?
           </Text>
           <Text style={styles.rulesText}>
-            • Verilen işlemi çözün{'\n'}
-            • Sonucu tabloda bulup tıklayın{'\n'}
-            • Doğru cevap: +10 puan{'\n'}
-            • Yanlış cevap: -5 puan{'\n'}
+            • Verilen işlemi çözün{'
+'}
+            • Sonucu tabloda bulup tıklayın{'
+'}
+            • Doğru cevap: +10 puan{'
+'}
+            • Yanlış cevap: -5 puan{'
+'}
             • Tüm sayıları bularak oyunu tamamlayın
           </Text>
         </View>
