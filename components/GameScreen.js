@@ -17,7 +17,7 @@ const GameScreen = () => {
   useEffect(() => {
     generateNewGame();
   }, []);
-
+  
   const generateNewGame = () => {
     const newNumbers = [];
     while (newNumbers.length < 25) {
