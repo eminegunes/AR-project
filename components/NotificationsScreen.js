@@ -9,6 +9,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { Audio } from 'expo-av';
 
 const NotificationsScreen = () => {
   const [width, setWidth] = useState(0);
@@ -17,14 +18,26 @@ const NotificationsScreen = () => {
   const [options, setOptions] = useState([]);
   const [attempts, setAttempts] = useState(2);
   const [score, setScore] = useState(0);
+  const [level, setLevel] = useState(1);
+  const [sound, setSound] = useState();
 
   useEffect(() => {
     generateNewProblem();
+    return () => sound && sound.unloadAsync();
   }, []);
 
+  const playSound = async (isCorrect) => {
+    const soundFile = isCorrect
+      ? require('./assets/correct.mp3')
+      : require('./assets/wrong.mp3');
+    const { sound } = await Audio.Sound.createAsync(soundFile);
+    setSound(sound);
+    await sound.playAsync();
+  };
+
   const generateNewProblem = () => {
-    const newWidth = Math.floor(Math.random() * 6) + 3;
-    const newLength = Math.floor(Math.random() * 6) + 3;
+    const newWidth = Math.floor(Math.random() * 6 * level) + 3;
+    const newLength = Math.floor(Math.random() * 6 * level) + 3;
     const actualArea = newWidth * newLength;
 
     setWidth(newWidth);
@@ -32,24 +45,22 @@ const NotificationsScreen = () => {
     setArea(actualArea);
     setAttempts(2);
 
-    // Generate 4 unique options including the correct answer
     const optionsList = generateOptions(actualArea);
     setOptions(optionsList);
   };
 
   const generateOptions = (correctArea) => {
     const options = [correctArea];
-    
+
     while (options.length < 4) {
-      const variation = Math.floor(Math.random() * 15) - 7; // -7 to +7
+      const variation = Math.floor(Math.random() * 15 * level) - 7;
       const newOption = correctArea + variation;
-      
+
       if (newOption > 0 && !options.includes(newOption)) {
         options.push(newOption);
       }
     }
-    
-    // Shuffle options
+
     return options.sort(() => Math.random() - 0.5);
   };
 
@@ -57,21 +68,25 @@ const NotificationsScreen = () => {
     if (selectedArea === area) {
       const pointsEarned = attempts === 2 ? 10 : 5;
       setScore(score + pointsEarned);
+      setLevel(level + 1);
+      playSound(true);
       Alert.alert(
-        ' Tebrikler!',
+        'Tebrikler!',
         `Doğru tahmin! ${pointsEarned} puan kazandınız!`,
         [{ text: 'Yeni Soru', onPress: generateNewProblem }]
       );
     } else {
       if (attempts > 1) {
         setAttempts(attempts - 1);
-        Alert.alert(' Yanlış', 'Bir deneme hakkınız daha var!');
+        playSound(false);
+        Alert.alert('Yanlış', 'Bir deneme hakkınız daha var!');
       } else {
         Alert.alert(
-          ' Oyun Bitti',
+          'Oyun Bitti',
           `Doğru cevap: ${area} m²`,
           [{ text: 'Yeni Soru', onPress: generateNewProblem }]
         );
+        setLevel(1);
       }
     }
   };
@@ -86,6 +101,7 @@ const NotificationsScreen = () => {
 
         <View style={styles.scoreContainer}>
           <Text style={styles.scoreText}>Puan: {score}</Text>
+          <Text style={styles.levelText}>Seviye: {level}</Text>
           <TouchableOpacity
             style={styles.newGameButton}
             onPress={generateNewProblem}
@@ -131,19 +147,6 @@ const NotificationsScreen = () => {
             </TouchableOpacity>
           ))}
         </View>
-
-        <View style={styles.rulesContainer}>
-          <Text style={styles.rulesTitle}>
-            <MaterialCommunityIcons name="information" size={20} color="#2D3748" />
-            {' '}Nasıl Oynanır?
-          </Text>
-          <Text style={styles.rulesText}>
-            • Verilen oda boyutlarına göre alanı tahmin edin{'\n'}
-            • İlk denemede: 10 puan{'\n'}
-            • İkinci denemede: 5 puan{'\n'}
-            • İki deneme hakkınız var
-          </Text>
-        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -170,9 +173,6 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   scoreContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     backgroundColor: 'white',
     padding: 15,
     borderRadius: 10,
@@ -181,44 +181,35 @@ const styles = StyleSheet.create({
   },
   scoreText: {
     fontSize: 20,
-    fontWeight: 'bold',
     color: '#48BB78',
+  },
+  levelText: {
+    fontSize: 16,
+    color: '#4A5568',
   },
   newGameButton: {
     backgroundColor: '#6C63FF',
-    flexDirection: 'row',
-    alignItems: 'center',
     padding: 10,
     borderRadius: 8,
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    marginLeft: 5,
   },
   roomContainer: {
     backgroundColor: 'white',
     padding: 20,
     borderRadius: 10,
-    marginBottom: 20,
     elevation: 2,
   },
   dimensionsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
     marginBottom: 15,
   },
   dimensionsText: {
     fontSize: 18,
-    fontWeight: 'bold',
     color: '#2D3748',
     marginLeft: 10,
   },
   roomVisual: {
     alignItems: 'center',
-    justifyContent: 'center',
-    padding: 10,
   },
   room: {
     width: '100%',
@@ -226,20 +217,15 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 2,
     borderColor: '#6C63FF',
-    borderStyle: 'dashed',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
   },
   roomDimension: {
     fontSize: 36,
-    fontWeight: 'bold',
     color: '#6C63FF',
   },
   attemptsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
     backgroundColor: 'white',
     padding: 15,
     borderRadius: 10,
@@ -248,49 +234,7 @@ const styles = StyleSheet.create({
   },
   attemptsText: {
     fontSize: 16,
-    fontWeight: 'bold',
     color: '#4A5568',
-    marginLeft: 10,
   },
   optionsContainer: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-  },
-  optionButton: {
-    width: '48%',
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
-    marginBottom: 15,
-    elevation: 2,
-    borderWidth: 2,
-    borderColor: '#6C63FF',
-  },
-  optionText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2D3748',
-    textAlign: 'center',
-  },
-  rulesContainer: {
-    backgroundColor: 'white',
-    padding: 15,
-    borderRadius: 10,
-    elevation: 2,
-  },
-  rulesTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2D3748',
-    marginBottom: 10,
-  },
-  rulesText: {
-    fontSize: 16,
-    color: '#4A5568',
-    lineHeight: 24,
-  },
-});
-
-export default NotificationsScreen;
