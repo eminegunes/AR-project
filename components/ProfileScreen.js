@@ -9,17 +9,18 @@ import {
   ScrollView,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { Canvas, Fill, RoundedRect } from '@shopify/react-native-skia';
 
 const ProfileScreen = () => {
   const [carCounts, setCarCounts] = useState({
-    red: 0,
-    black: 0,
-    gray: 0,
+    blue: 0,
+    green: 0,
+    orange: 0,
   });
   const [guesses, setGuesses] = useState({
-    red: '',
-    black: '',
-    gray: '',
+    blue: '',
+    green: '',
+    orange: '',
   });
   const [score, setScore] = useState(0);
   const [submitted, setSubmitted] = useState(false);
@@ -30,17 +31,17 @@ const ProfileScreen = () => {
 
   const generateNewGame = () => {
     const newCounts = {
-      red: Math.floor(Math.random() * 10) + 3,
-      black: Math.floor(Math.random() * 10) + 3,
-      gray: Math.floor(Math.random() * 10) + 3,
+      blue: Math.floor(Math.random() * 10) + 3,
+      green: Math.floor(Math.random() * 10) + 3,
+      orange: Math.floor(Math.random() * 10) + 3,
     };
     setCarCounts(newCounts);
-    setGuesses({ red: '', black: '', gray: '' });
+    setGuesses({ blue: '', green: '', orange: '' });
     setSubmitted(false);
   };
 
   const calculatePercentage = (count) => {
-    const total = carCounts.red + carCounts.black + carCounts.gray;
+    const total = carCounts.blue + carCounts.green + carCounts.orange;
     return ((count / total) * 100).toFixed(1);
   };
 
@@ -51,12 +52,12 @@ const ProfileScreen = () => {
   };
 
   const checkGuesses = () => {
-    if (!guesses.red || !guesses.black || !guesses.gray) {
+    if (!guesses.blue || !guesses.green || !guesses.orange) {
       Alert.alert('⚠️ Uyarı', 'Lütfen tüm yüzdeleri girin!');
       return;
     }
 
-    const guessSum = parseFloat(guesses.red) + parseFloat(guesses.black) + parseFloat(guesses.gray);
+    const guessSum = parseFloat(guesses.blue) + parseFloat(guesses.green) + parseFloat(guesses.orange);
     if (Math.abs(guessSum - 100) > 0.1) {
       Alert.alert('⚠️ Uyarı', 'Yüzdelerin toplamı 100 olmalıdır!');
       return;
@@ -96,30 +97,34 @@ const ProfileScreen = () => {
 
   const renderCarCard = (color) => {
     const colorMap = {
-      red: '#FC8181',
-      black: '#2D3748',
-      gray: '#A0AEC0',
+      blue: '#4299E1',
+      green: '#48BB78',
+      orange: '#F6AD55',
     };
 
     const colorNames = {
-      red: 'Kırmızı',
-      black: 'Siyah',
-      gray: 'Gri',
+      blue: 'Mavi',
+      green: 'Yeşil',
+      orange: 'Turuncu',
     };
 
     return (
-      <View style={[styles.carCard, { borderColor: colorMap[color] }]}>
+      <View style={[styles.carCard, { borderColor: colorMap[color] }]}>        
+        <Canvas style={{ width: 100, height: 100 }}>
+          <Fill color={colorMap[color]} />
+          <RoundedRect x={10} y={10} width={80} height={80} r={15} />
+        </Canvas>
         <View style={styles.carHeader}>
           <MaterialCommunityIcons 
             name="car" 
             size={30} 
             color={colorMap[color]} 
           />
-          <Text style={[styles.carTitle, { color: colorMap[color] }]}>
+          <Text style={[styles.carTitle, { color: colorMap[color] }]}>            
             {colorNames[color]} Arabalar
           </Text>
         </View>
-        
+
         <View style={styles.carInfo}>
           <Text style={styles.countText}>Sayı: {carCounts[color]}</Text>
           {submitted && (
@@ -148,7 +153,7 @@ const ProfileScreen = () => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <MaterialCommunityIcons name="car-multiple" size={40} color="#6C63FF" />
+        <MaterialCommunityIcons name="car-multiple" size={40} color="#2B6CB0" />
         <Text style={styles.title}>Araba Yüzdeleri</Text>
       </View>
 
@@ -163,9 +168,9 @@ const ProfileScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {renderCarCard('red')}
-      {renderCarCard('black')}
-      {renderCarCard('gray')}
+      {renderCarCard('blue')}
+      {renderCarCard('green')}
+      {renderCarCard('orange')}
 
       <TouchableOpacity
         style={styles.checkButton}
@@ -174,20 +179,6 @@ const ProfileScreen = () => {
         <MaterialCommunityIcons name="check-circle" size={24} color="white" />
         <Text style={styles.buttonText}>Tahminleri Kontrol Et</Text>
       </TouchableOpacity>
-
-      <View style={styles.rulesContainer}>
-        <Text style={styles.rulesTitle}>
-          <MaterialCommunityIcons name="information" size={20} color="#2D3748" />
-          {' '}Nasıl Oynanır?
-        </Text>
-        <Text style={styles.rulesText}>
-          • Her renk için yüzde tahmini yapın{'\n'}
-          • Tam isabet: +10 puan{'\n'}
-          • 5% fark: +5 puan{'\n'}
-          • 10% fark: +2 puan{'\n'}
-          • Tahminlerin toplamı 100 olmalı
-        </Text>
-      </View>
     </ScrollView>
   );
 };
@@ -226,7 +217,7 @@ const styles = StyleSheet.create({
     color: '#48BB78',
   },
   newGameButton: {
-    backgroundColor: '#6C63FF',
+    backgroundColor: '#4299E1',
     flexDirection: 'row',
     alignItems: 'center',
     padding: 10,
@@ -297,24 +288,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     marginLeft: 5,
-  },
-  rulesContainer: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
-    marginBottom: 20,
-    elevation: 2,
-  },
-  rulesTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2D3748',
-    marginBottom: 10,
-  },
-  rulesText: {
-    fontSize: 14,
-    lineHeight: 24,
-    color: '#4A5568',
   },
 });
 
