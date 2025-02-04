@@ -6,22 +6,29 @@ import {
   TouchableOpacity,
   Alert,
   ScrollView,
+  Dimensions,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
+const { width } = Dimensions.get('window');
+const GRID_SIZE = 5;
+const BOX_SIZE = (width - 60) / GRID_SIZE;
 
 const GameScreen = () => {
   const [numbers, setNumbers] = useState([]);
   const [selectedNumbers, setSelectedNumbers] = useState([]);
   const [score, setScore] = useState(0);
+  const [level, setLevel] = useState(1);
 
   useEffect(() => {
-    generateNewGame();
-  }, []);
-  
-  const generateNewGame = () => {
+    generateNewGame(level);
+  }, [level]);
+
+  const generateNewGame = (level) => {
+    const maxNumber = level * 100;
     const newNumbers = [];
-    while (newNumbers.length < 25) {
-      const num = Math.floor(Math.random() * 100) + 1;
+    while (newNumbers.length < GRID_SIZE * GRID_SIZE) {
+      const num = Math.floor(Math.random() * maxNumber) + 1;
       if (!newNumbers.includes(num)) {
         newNumbers.push(num);
       }
@@ -39,11 +46,17 @@ const GameScreen = () => {
     if (number % 7 === 0) {
       setSelectedNumbers([...selectedNumbers, number]);
       setScore(score + 1);
-      if (selectedNumbers.length + 1 === numbers.filter(n => n % 7 === 0).length) {
+      const divisibleCount = numbers.filter((n) => n % 7 === 0).length;
+      if (selectedNumbers.length + 1 === divisibleCount) {
         Alert.alert(
           '🎉 Tebrikler!',
-          `Tüm 7'ye bölünebilen sayıları buldunuz!\nPuanınız: ${score + 1}`,
-          [{ text: 'Yeni Oyun', onPress: generateNewGame }]
+          `Tüm 7'ye bölünebilen sayıları buldunuz! Puanınız: ${score + 1}`,
+          [
+            {
+              text: 'Sonraki Seviye',
+              onPress: () => setLevel(level + 1),
+            },
+          ]
         );
       } else {
         Alert.alert('✨ Doğru!', '7\'ye bölünebilen bir sayı buldunuz!');
@@ -83,15 +96,19 @@ const GameScreen = () => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <MaterialCommunityIcons name="numeric-7-box-multiple" size={40} color="#6C63FF" />
-        <Text style={styles.title}>7'ye Bölünebilen Sayıları Bul</Text>
+        <MaterialCommunityIcons
+          name="numeric-7-box-multiple"
+          size={40}
+          color="#6C63FF"
+        />
+        <Text style={styles.title}>7'ye Bölünebilen Sayıları Bul - Seviye {level}</Text>
       </View>
 
       <View style={styles.scoreContainer}>
         <Text style={styles.scoreText}>Puan: {score}</Text>
         <TouchableOpacity
           style={styles.newGameButton}
-          onPress={generateNewGame}
+          onPress={() => generateNewGame(level)}
         >
           <MaterialCommunityIcons name="refresh" size={24} color="white" />
           <Text style={styles.buttonText}>Yeni Oyun</Text>
@@ -99,13 +116,20 @@ const GameScreen = () => {
       </View>
 
       <View style={styles.grid}>
-        {Array(5).fill().map((_, rowIndex) => (
-          <View key={rowIndex} style={styles.row}>
-            {Array(5).fill().map((_, colIndex) => (
-              renderNumber(numbers[rowIndex * 5 + colIndex], rowIndex * 5 + colIndex)
-            ))}
-          </View>
-        ))}
+        {Array(GRID_SIZE)
+          .fill()
+          .map((_, rowIndex) => (
+            <View key={rowIndex} style={styles.row}>
+              {Array(GRID_SIZE)
+                .fill()
+                .map((_, colIndex) =>
+                  renderNumber(
+                    numbers[rowIndex * GRID_SIZE + colIndex],
+                    rowIndex * GRID_SIZE + colIndex
+                  )
+                )}
+            </View>
+          ))}
       </View>
 
       <View style={styles.rulesContainer}>
@@ -114,10 +138,13 @@ const GameScreen = () => {
           {' '}Nasıl Oynanır?
         </Text>
         <Text style={styles.rulesText}>
-          • 7'ye bölünebilen sayıları bulun{'\n'}
-          • Doğru tahmin: +1 puan{'\n'}
-          • Yanlış tahmin: -1 puan{'\n'}
-          • Tüm sayıları bulduğunuzda oyun biter
+          • 7'ye bölünebilen sayıları bulun{'
+'}
+          • Doğru tahmin: +1 puan{'
+'}
+          • Yanlış tahmin: -1 puan{'
+'}
+          • Tüm sayıları bulduğunuzda sonraki seviyeye geçersiniz
         </Text>
       </View>
     </ScrollView>
@@ -181,8 +208,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   numberBox: {
-    width: 55,
-    height: 55,
+    width: BOX_SIZE,
+    height: BOX_SIZE,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#EDF2F7',
