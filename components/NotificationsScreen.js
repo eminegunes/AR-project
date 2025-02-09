@@ -236,5 +236,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#4A5568',
   },
-  optionsContainer: {
-    flexDirection: 'row',
+    optionsContainer: {
+      flexDirection: 'row'
+    },
+  });
+  export default NotificationsScreen;
