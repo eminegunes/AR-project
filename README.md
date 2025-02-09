@@ -22,7 +22,7 @@ Bu proje, React Native ve Expo kullanılarak geliştirilmiş bir 2D Artırılmı
 
 1. Projeyi klonlayın:
 ```bash
-git clone [proje-url]
+git clone https://github.com/eminegunes/AR-project.git
 ```
 
 2. Bağımlılıkları yükleyin:
@@ -52,6 +52,14 @@ yarn start
 2. Expo CLI üzerinden projeyi başlatın
 3. QR kodu mobil cihazınızla tarayın
 4. Uygulamayı kullanmaya başlayın
+
+## Proje Kurulum Raporu
+
+https://docs.google.com/document/d/1Oo71-DRspVK0TyB5Kvu97NdBeqEYjtg-/edit?usp=share_link&ouid=115123888602511138334&rtpof=true&sd=true
+
+## Raporlama
+
+https://docs.google.com/document/d/14JzA6bEOVh_pZTnJ4NNmCyjCYK4Db578/edit?usp=share_link&ouid=115123888602511138334&rtpof=true&sd=true
 
 ## Trello
 
